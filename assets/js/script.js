@@ -46,19 +46,16 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 var auditTask = function(taskEl) {
-
   // get date from task element
   var date = $(taskEl)
     .find("span")
     .text()
     .trim();
 
-  console.log(date);
 
   // convert to moment object at 5:00pm
   var time = moment(date, "L").set("hour", 17);
 
-  console.log(time);
 
   // remove any old classes from element
   $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
@@ -120,9 +117,6 @@ $(".card .list-group").sortable({
     tasks[arrName] = tempArr;
     saveTasks();
   },
-  stop: function(event) {
-    $(this).removeClass("dropover");
-  }
 });
 
 // trash icon can be dropped onto
@@ -274,6 +268,7 @@ $(".list-group").on("change", "input[type='text']", function() {
     .addClass("badge badge-primary badge-pill")
     .text(date);
   $(this).replaceWith(taskSpan);
+  auditTask($(taskSpan).closest(".list-group-item"));
 });
 
 // remove all tasks
@@ -284,8 +279,16 @@ $("#remove-tasks").on("click", function() {
   }
   saveTasks();
 });
-
 // load tasks for the first time
 loadTasks();
+
+// audit task due dates every 30 minutes
+setInterval(function() {
+  $(".card .list-group-item").each(function() {
+    auditTask($(this));
+  });
+}, 1800000);
+
+
 
 
